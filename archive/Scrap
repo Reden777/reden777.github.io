@@ -1,0 +1,5 @@
+uv venv
+source .venv/bin/activate
+uv pip install scrapling[all]
+playwright install chrome
+scrapling extract stealthy-fetch https://intentionrepeater.boards.net/thread/1113/catalaya-universe Catalaya_Thread1.html --css-selector "article" --ai-targeted
