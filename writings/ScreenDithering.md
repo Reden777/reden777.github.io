@@ -1227,3 +1227,74 @@ If you selected that:
 
 * **If you run Classic Mac OS on real vintage hardware (a Power Mac G3/G4):** It will drastically reduce flicker because the video card will never feed the monitor chaotic micro-values.
 * **If you run Classic Mac OS in an emulator (like SheepShaver or Basilisk II) on Windows 11:** It **won't help**. Windows DWM will take the emulator window, composite it inside a modern 32-bit desktop buffer, and output it through your modern GPU pipeline, triggering the exact same FRC on your LG monitor.
+
+---------User:
+
+Here are 3 images showing my monitor's modes. Because it's analogue, it does support 1024x768 at 75 hz
+
+---------Assistant:
+
+There are several revealing details in that list of modes that explain your monitor’s behavior, the reason for 75 Hz, and another subtle cause of shimmering on 1-pixel stars.
+
+---
+
+### 1. The 75 Hz Temptation: Higher Refresh vs. The Scaling Trap
+
+You caught an important detail: **1024×768 supports 75 Hz.**
+
+#### Why does it support 75 Hz only at 1024×768?
+It comes down to the **analog pixel clock bandwidth** of the monitor’s internal ADC (analog-to-digital converter):
+* **1024×768 @ 75 Hz** requires a pixel clock of **78.75 MHz** (a classic VESA standard from the CRT era).
+* **1366×768 @ 60 Hz** requires **~85.5 MHz**.
+* If the monitor tried to run its full native resolution at 75 Hz, it would need **~110 MHz**, which exceeds the bandwidth of the budget scaler chip LG put in this monitor. So 75 Hz was only enabled for lower resolutions.
+
+#### Would 75 Hz fix the FRC flicker?
+**In theory, yes:** Pushing the refresh rate from 60 Hz to 75 Hz pushes the FRC cycle and pixel inversion frequency much closer to your peripheral vision's **flicker fusion threshold**. The screen would physically vibrate 25% faster, making it much harder for your rods to detect.
+
+**In practice, it creates a worse disaster:**
+1. **Aspect Ratio Distortion:** 1024×768 is a **4:3** box. Your monitor is physically a **16:9** widescreen. The image will either be stretched wide (making everything fat) or pillarboxed with black bars on the sides.
+2. **The Loss of 1:1 Pixel Mapping:** Because the glass physically has 1366 horizontal columns of liquid crystals, your monitor's internal scaler has to invent and stretch 1024 pixels across 1366 physical columns.
+3. **The Blur & Smear:** That stretching is done with a cheap bilinear filter. Your crisp 1-pixel white stars will be smeared across 1.33 physical pixels, turning into blurry gray smudges. And because that blur creates millions of new intermediate gray values, **it triggers FRC across the entire screen!**
+
+---
+
+### 2. The "1360 vs 1366" Mystery (The Missing 6 Pixels)
+
+Notice the mode you currently have highlighted:
+
+> **`1360 by 768, True Color (32 bit), 60 Hertz`**
+
+Your LG Flatron E1940S physically has **1366 × 768** pixels. Where did the other 6 pixels go?
+
+This is a notorious quirk of early widescreen computing:
+* In computer graphics architecture, framebuffers historically had to be **divisible by 8** (the standard 8-pixel character cell width dating back to IBM VGA text mode).
+* $1360 \div 8 = 170$ (Clean integer).
+* $1366 \div 8 = 170.75$ (Not divisible by 8!).
+
+Because 1366 wasn't divisible by 8, many graphics cards and VESA standards refused to output 1366. Instead, they output **1360**.
+
+#### Why this causes 1-pixel stars to shimmer:
+If your Windows resolution is set to **1360×768** instead of the native **1366×768**:
+* The monitor's analog scaler is either taking 1360 pixels and stretching them slightly to fill 1366 physical crystals, or leaving 3 black columns of pixels on the left and right.
+* If it stretches, **you lose native 1:1 pixel mapping**. Every few dozen pixels, a pixel has to be interpolated across two physical subpixel triads.
+* If a 1-pixel star lands on an interpolated boundary on an analog VGA connection, it will **shimmer, blur, and jitter violently** as the monitor's phase clock drifts!
+
+*(If you can add a Custom Resolution in the NVIDIA Control Panel for true **1366×768**, you might gain crisp 1:1 pixel sharpness over the current 1360 setting).*
+
+---
+
+### 3. Look at 1080p Lurking at the Bottom
+
+Notice that the list also includes:
+> **`1920 by 1080, True Color (32 bit), 60 Hertz`**
+
+How can a 768p monitor accept a 1080p signal?
+LG programmed the EDID to accept 1080p so that if someone plugged a 2010 game console (like a PS3 or Xbox 360) into it via an adapter, the console wouldn't show a black "Unsupported Signal" screen. The monitor's scaler silently grabs the 1080p image and downsamples it to 768p—destroying text sharpness in the process.
+
+---
+
+### 4. Notice: "True Color (32 bit)" Everywhere
+
+Look down the entire list: every single resolution and refresh rate is locked to **`True Color (32 bit)`**. 
+
+Just as we discussed earlier with modern Windows DWM, the legacy 16-bit and 8-bit modes have been completely purged from the operating system's driver stack. Windows is insisting on sending 32-bit color to an analog cable feeding a 6-bit piece of glass, leaving your monitor's FRC chip to bridge the mathematical gap.
