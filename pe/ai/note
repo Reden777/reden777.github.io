@@ -1,1 +1,2 @@
 Includes renamed .txt versions, as well as pdf conversions for AI teaching.
+The "instructions_converted.pdf" was converted to PDF 1.4 by GhostScript to make it readable by AI. It previously gave "Token count failed" in AI Studio, which may have been in reality because it wasn't UTF-8.
