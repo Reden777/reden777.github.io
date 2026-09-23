@@ -25,7 +25,7 @@
     body {
       background-color: var(--bg);
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Segoe UI";
       line-height: 1.5;
       padding-bottom: 80px;
     }
@@ -225,29 +225,42 @@
       word-break: break-word;
     }
 
-    /* Font Specific Classes with full fallbacks */
-    .f-calibri         { font-family: 'Calibri', 'Carlito', sans-serif; }
-    .f-calibri-light   { font-family: 'Calibri Light', 'Calibri', sans-serif; font-weight: 300; }
-    .f-cambria         { font-family: 'Cambria', 'Georgia', serif; }
-    .f-candara         { font-family: 'Candara', sans-serif; }
-    .f-consolas        { font-family: 'Consolas', 'Lucida Console', monospace; }
-    .f-constantia      { font-family: 'Constantia', 'Georgia', serif; }
-    .f-corbel          { font-family: 'Corbel', sans-serif; }
+    /* Font-specific classes */
+    .f-calibri         { font-family: 'Calibri'; }
+    .f-calibri-light   { font-family: 'Calibri Light'; font-weight: 300; }
+    .f-cambria         { font-family: 'Cambria'; }
+    .f-candara         { font-family: 'Candara'; }
+    .f-consolas        { font-family: 'Consolas'; }
+    .f-constantia      { font-family: 'Constantia'; }
+    .f-corbel          { font-family: 'Corbel'; }
 
-    .f-arial           { font-family: 'Arial', 'Helvetica Neue', sans-serif; }
-    .f-arial-black     { font-family: 'Arial Black', 'Impact', sans-serif; font-weight: 900; }
-    .f-comic-sans      { font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif; }
-    .f-courier-new     { font-family: 'Courier New', Courier, monospace; }
-    .f-georgia         { font-family: 'Georgia', serif; }
-    .f-impact          { font-family: 'Impact', 'Charcoal', sans-serif; }
-    .f-lucida-console  { font-family: 'Lucida Console', 'Monaco', monospace; }
-    .f-lucida-sans     { font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif; }
-    .f-palatino        { font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; }
-    .f-tahoma          { font-family: 'Tahoma', 'Verdana', sans-serif; }
-    .f-times           { font-family: 'Times New Roman', Times, serif; }
-    .f-trebuchet       { font-family: 'Trebuchet MS', sans-serif; }
-    .f-verdana         { font-family: 'Verdana', sans-serif; }
-
+    .f-arial           { font-family: 'Arial'; }
+    .f-arial-black     { font-family: 'Arial Black'; font-weight: 900; }
+    .f-comic-sans      { font-family: 'Comic Sans MS'; }
+    .f-courier-new     { font-family: 'Courier New'; }
+    .f-georgia         { font-family: 'Georgia'; }
+    .f-impact          { font-family: 'Impact'; }
+    .f-lucida-console  { font-family: 'Lucida Console'; }
+    .f-lucida-sans     { font-family: 'Lucida Sans Unicode'; }
+    .f-palatino        { font-family: 'Palatino Linotype'; }
+    .f-tahoma          { font-family: 'Tahoma'; }
+    .f-times           { font-family: 'Times New Roman'; }
+    .f-trebuchet       { font-family: 'Trebuchet MS'; }
+    .f-verdana         { font-family: 'Verdana'; }
+    /* Older 90s fonts */
+    .f-andale           { font-family: 'Andale Mono'; }
+    .f-century          { font-family: 'Century Gothic'; }
+    .f-book-antiqua     { font-family: 'Book Antiqua'; }
+    .f-garamond         { font-family: Garamond; }
+    .f-haettenschweiler { font-family: Haettenschweiler; }
+    .f-bookman          { font-family: 'Bookman Old Style'; }
+    .f-corsiva          { font-family: 'Monotype Corsiva'; }
+    .f-papyrus          { font-family: Papyrus; }
+    .f-curlz            { font-family: 'Curlz MT'; }
+    .f-ms-sans          { font-family: 'MS Sans Serif'; }
+    .f-fixedsys         { font-family: Fixedsys; }
+    .f-webdings         { font-family: Webdings; }
+    .f-wingdings        { font-family: Wingdings; }
     @media (max-width: 640px) {
       .specimen-row {
         grid-template-columns: 1fr;
@@ -310,15 +323,15 @@
       {
         id: 'cfonts',
         groupTitle: 'ClearType C-Fonts',
-        description: 'Introduced with Windows Vista and Office 2007, engineered specifically for Microsoft’s ClearType subpixel rendering technology.',
+        description: 'Introduced with Windows Vista and Office 2007, engineered specifically for Microsoft ClearType subpixel rendering technology.',
         fonts: [
-          { name: 'Calibri', cssClass: 'f-calibri', type: 'Humanist Sans-Serif', stack: "Calibri, Carlito, sans-serif" },
-          { name: 'Calibri Light', cssClass: 'f-calibri-light', type: 'Light Sans-Serif (Win 8/Office 2013)', stack: "'Calibri Light', Calibri, sans-serif" },
-          { name: 'Cambria', cssClass: 'f-cambria', type: 'Transitional Serif (Body/Math)', stack: "Cambria, Georgia, serif" },
-          { name: 'Candara', cssClass: 'f-candara', type: 'Humanist Sans-Serif', stack: "Candara, sans-serif" },
-          { name: 'Consolas', cssClass: 'f-consolas', type: 'Monospace Programming', stack: "Consolas, 'Lucida Console', monospace" },
-          { name: 'Constantia', cssClass: 'f-constantia', type: 'Transitional Serif', stack: "Constantia, Georgia, serif" },
-          { name: 'Corbel', cssClass: 'f-corbel', type: 'Clean Sans-Serif', stack: "Corbel, sans-serif" }
+          { name: 'Calibri', cssClass: 'f-calibri', type: 'Humanist Sans-Serif', stack: "Calibri" },
+          { name: 'Calibri Light', cssClass: 'f-calibri-light', type: 'Light Sans-Serif (Win 8/Office 2013)', stack: "'Calibri Light'" },
+          { name: 'Cambria', cssClass: 'f-cambria', type: 'Transitional Serif (Body/Math)', stack: "Cambria" },
+          { name: 'Candara', cssClass: 'f-candara', type: 'Humanist Sans-Serif', stack: "Candara" },
+          { name: 'Consolas', cssClass: 'f-consolas', type: 'Monospace Programming', stack: "Consolas" },
+          { name: 'Constantia', cssClass: 'f-constantia', type: 'Transitional Serif', stack: "Constantia" },
+          { name: 'Corbel', cssClass: 'f-corbel', type: 'Clean Sans-Serif', stack: "Corbel" }
         ]
       },
       {
@@ -326,20 +339,40 @@
         groupTitle: 'Classic Microsoft Fonts',
         description: 'The standard TrueType core fonts shipped with Windows 95/98/2000/XP and the classic "Core fonts for the Web" initiative.',
         fonts: [
-          { name: 'Arial', cssClass: 'f-arial', type: 'Neo-Grotesque Sans-Serif', stack: "Arial, 'Helvetica Neue', sans-serif" },
-          { name: 'Arial Black', cssClass: 'f-arial-black', type: 'Heavy Display Sans-Serif', stack: "'Arial Black', Impact, sans-serif" },
-          { name: 'Comic Sans MS', cssClass: 'f-comic-sans', type: 'Casual Script', stack: "'Comic Sans MS', cursive, sans-serif" },
-          { name: 'Courier New', cssClass: 'f-courier-new', type: 'Monospace Slab Serif', stack: "'Courier New', Courier, monospace" },
-          { name: 'Georgia', cssClass: 'f-georgia', type: 'Screen Serif', stack: "Georgia, serif" },
-          { name: 'Impact', cssClass: 'f-impact', type: 'Condensed Poster / Display', stack: "Impact, Charcoal, sans-serif" },
-          { name: 'Lucida Console', cssClass: 'f-lucida-console', type: 'Monospace Screen Font', stack: "'Lucida Console', Monaco, monospace" },
-          { name: 'Lucida Sans Unicode', cssClass: 'f-lucida-sans', type: 'Humanist Sans-Serif', stack: "'Lucida Sans Unicode', sans-serif" },
-          { name: 'Palatino Linotype', cssClass: 'f-palatino', type: 'Old Style Serif', stack: "'Palatino Linotype', 'Book Antiqua', serif" },
-          { name: 'Tahoma', cssClass: 'f-tahoma', type: 'Tight Sans-Serif', stack: "Tahoma, Verdana, sans-serif" },
-          { name: 'Times New Roman', cssClass: 'f-times', type: 'Transitional Serif', stack: "'Times New Roman', Times, serif" },
-          { name: 'Trebuchet MS', cssClass: 'f-trebuchet', type: 'Humanist Sans-Serif', stack: "'Trebuchet MS', sans-serif" },
-          { name: 'Verdana', cssClass: 'f-verdana', type: 'Wide Screen Sans-Serif', stack: "Verdana, sans-serif" }
+          { name: 'Arial', cssClass: 'f-arial', type: 'Neo-Grotesque Sans-Serif', stack: "Arial" },
+          { name: 'Arial Black', cssClass: 'f-arial-black', type: 'Heavy Display Sans-Serif', stack: "'Arial Black'" },
+          { name: 'Comic Sans MS', cssClass: 'f-comic-sans', type: 'Casual Script', stack: "'Comic Sans MS'" },
+          { name: 'Courier New', cssClass: 'f-courier-new', type: 'Monospace Slab Serif', stack: "'Courier New'" },
+          { name: 'Georgia', cssClass: 'f-georgia', type: 'Screen Serif', stack: "Georgia" },
+          { name: 'Impact', cssClass: 'f-impact', type: 'Condensed Poster / Display', stack: "Impact" },
+          { name: 'Lucida Console', cssClass: 'f-lucida-console', type: 'Monospace Screen Font', stack: "'Lucida Console'" },
+          { name: 'Lucida Sans Unicode', cssClass: 'f-lucida-sans', type: 'Humanist Sans-Serif', stack: "'Lucida Sans Unicode'" },
+          { name: 'Palatino Linotype', cssClass: 'f-palatino', type: 'Old Style Serif', stack: "'Palatino Linotype'" },
+          { name: 'Tahoma', cssClass: 'f-tahoma', type: 'Tight Sans-Serif', stack: "Tahoma" },
+          { name: 'Times New Roman', cssClass: 'f-times', type: 'Transitional Serif', stack: "'Times New Roman'" },
+          { name: 'Trebuchet MS', cssClass: 'f-trebuchet', type: 'Humanist Sans-Serif', stack: "'Trebuchet MS'" },
+          { name: 'Verdana', cssClass: 'f-verdana', type: 'Wide Screen Sans-Serif', stack: "Verdana" }
         ]
+      },
+      {
+  id: 'plus90s',
+  groupTitle: 'Windows 95, Plus! & Office 90s Classics',
+  description: 'Iconic fonts shipped with Windows 3.1/95/98, Microsoft Plus!, and Office 95/97.',
+  fonts: [
+    { name: 'Andale Mono', cssClass: 'f-andale', type: 'Web Core Monospace (1998)', stack: "'Andale Mono'" },
+    { name: 'Century Gothic', cssClass: 'f-century', type: 'Geometric Sans (Plus! 95)', stack: "'Century Gothic'" },
+    { name: 'Book Antiqua', cssClass: 'f-book-antiqua', type: 'Palatino Clone (Office 95/97)', stack: "'Book Antiqua'" },
+    { name: 'Monotype Garamond', cssClass: 'f-garamond', type: 'Old Style Serif (Office 97)', stack: "Garamond" },
+    { name: 'Haettenschweiler', cssClass: 'f-haettenschweiler', type: 'Ultra Condensed Sans (Plus! 95)', stack: "Haettenschweiler" },
+    { name: 'Bookman Old Style', cssClass: 'f-bookman', type: 'Retro Serif (Office 97)', stack: "'Bookman Old Style'" },
+    { name: 'Monotype Corsiva', cssClass: 'f-corsiva', type: 'Formal Script (Office 97)', stack: "'Monotype Corsiva'" },
+    { name: 'Papyrus', cssClass: 'f-papyrus', type: 'Decorative (Office 97/Publisher)', stack: "Papyrus" },
+    { name: 'Curlz MT', cssClass: 'f-curlz', type: 'Novelty Display (1995)', stack: "'Curlz MT'" },
+    { name: 'MS Sans Serif', cssClass: 'f-ms-sans', type: 'Classic Win 95 UI Dialogs', stack: "'MS Sans Serif'" },
+    { name: 'Fixedsys', cssClass: 'f-fixedsys', type: 'Win 3.1/95 Bitmap Terminal', stack: "Fixedsys" },
+    { name: 'Webdings', cssClass: 'f-webdings', type: 'Symbol Web Font (1997)', stack: "Webdings" },
+    { name: 'Wingdings', cssClass: 'f-wingdings', type: 'Windows 3.1 Symbols (1990)', stack: "Wingdings" }
+  ]
       }
     ];
 
