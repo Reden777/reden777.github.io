@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServitorConnect Web (SCNewHash)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+	    background: #aaaaaa;
+        }
+        #intentionInput {
+            width: 80ch;
+            height: 5em;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        input[type="number"] {
+            width: 100px;
+            text-align: center;
+            padding: 3px;
+        }
+        #status {
+            margin-top: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: "Times New Roman", Times, serif;
+        }
+        button {
+            padding: 8px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .file-box {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        #clearFileBtn {
+            font-size: 14px;
+            padding: 4px 10px;
+            background-color: #ff4c4c;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ServitorConnect Web</h1>
+    
+    <div class="file-box">
+        <label for="fileInput"><strong>Load Intention File (Text, Image, PDF, etc): </strong></label>
+        <input type="file" id="fileInput">
+        <button id="clearFileBtn" onclick="clearFile()" style="display:none;">Clear File</button>
+    </div>
+
+    <div>
+        <label for="intentionInput">Intention (or loaded file state): </label><br>
+        <!-- Removed maxlength entirely. Input is now unlimited! -->
+        <textarea id="intentionInput" placeholder="Type an intention here, or load a file above..."></textarea>
+    </div>
+    
+    <div class="input-group">
+        <label for="iterationsInput">Iterations per Repeat (N): </label>
+        <input type="number" id="iterationsInput" value="88888888" min="1">
+    </div>
+
+    <div class="input-group">
+        <label for="repeatsInput">Repeats per Hour: </label>
+        <input type="number" id="repeatsInput" value="1" min="1">
+    </div>
+
+    <div class="input-group">
+        <label for="durationInput">Duration (Seconds): </label>
+        <input type="number" id="durationInput" value="3600" min="1">
+    </div>
+
+    <button id="startBtn" onclick="startProcess()">Start Hashing</button>
+    <button id="stopBtn" onclick="stopProcess()" style="display:none; color: red;">Stop</button>
+
+    <div id="status">Waiting to start...</div>
+
+    <script>
+        let timerInterval;
+        let worker;
+        let loadedFileData = null; // Holds raw binary bytes if a file is loaded
+
+        // --- 1. Binary File Loading Logic ---
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Store the raw bytes (0-255) into memory
+                    loadedFileData = new Uint8Array(e.target.result);
+                    
+                    // Update UI to reflect a binary file is loaded
+                    const textArea = document.getElementById('intentionInput');
+                    textArea.value = `[Binary File Loaded: ${file.name}]\n[Size: ${file.size} bytes]\n\nThe raw binary data of this file is loaded into memory and will be hashed.`;
+                    textArea.disabled = true; // Prevent user from typing over the file status
+                    
+                    document.getElementById('clearFileBtn').style.display = 'inline-block';
+                };
+                reader.readAsArrayBuffer(file); // Reads any file type perfectly
+            }
+        });
+
+        // Allows the user to remove the file and type text again
+        function clearFile() {
+            loadedFileData = null;
+            document.getElementById('fileInput').value = ""; 
+            const textArea = document.getElementById('intentionInput');
+            textArea.value = "";
+            textArea.disabled = false;
+            document.getElementById('clearFileBtn').style.display = 'none';
+        }
+
+        // --- 2. Web Worker (Background Hashing) ---
+        const workerCode = `
+            self.onmessage = function(e) {
+                const baseIntent = e.data.baseIntent; // Can be a String or a Uint8Array
+                const repeats = e.data.repeats;
+                const iterations = e.data.iterations;
+
+                for (let r = 0; r < repeats; r++) {
+                    let intentionValue = baseIntent;
+                    
+                    for (let i = 0; i < iterations; i++) {
+                        let h = 0;
+                        
+                        // Iteration 0: If binary file data, hash the raw bytes directly
+                        if (i === 0 && intentionValue instanceof Uint8Array) {
+                            for (let j = 0; j < intentionValue.length; j++) {
+                                h = (h * 31 + intentionValue[j]) >>> 0;
+                            }
+                        } 
+                        // Subsequent iterations (or standard text): Hash as string
+                        else {
+                            let strVal = String(intentionValue); 
+                            for (let j = 0; j < strVal.length; j++) {
+                                h = (h * 31 + strVal.charCodeAt(j)) >>> 0;
+                            }
+                        }
+                        
+                        intentionValue = h; // Assign output back for the next iteration
+                    }
+                }
+            };
+        `;
+
+        const blob = new Blob([workerCode], { type: 'application/javascript' });
+        const workerUrl = URL.createObjectURL(blob);
+
+        function formatTime(totalSeconds) {
+            const hrs = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+            const mins = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const secs = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${hrs}:${mins}:${secs}`;
+        }
+
+        function startProcess() {
+            // Use binary data if loaded, otherwise use whatever is typed in the box
+            const intention = loadedFileData ? loadedFileData : document.getElementById('intentionInput').value.trim();
+            const iterations = parseInt(document.getElementById('iterationsInput').value);
+            const repeats = parseInt(document.getElementById('repeatsInput').value);
+            const duration = parseInt(document.getElementById('durationInput').value);
+
+            if (!intention) {
+                alert("Please enter an intention or load a file.");
+                return;
+            }
+            if (isNaN(iterations) || iterations <= 0 || isNaN(repeats) || repeats <= 0 || isNaN(duration) || duration <= 0) {
+                alert("Please enter valid positive numbers for Iterations, Repeats, and Duration.");
+                return;
+            }
+
+            // Lock UI
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            document.getElementById('intentionInput').disabled = true;
+            document.getElementById('fileInput').disabled = true;
+            document.getElementById('clearFileBtn').disabled = true;
+            document.getElementById('iterationsInput').disabled = true;
+            document.getElementById('repeatsInput').disabled = true;
+            document.getElementById('durationInput').disabled = true;
+
+            if (worker) worker.terminate();
+            worker = new Worker(workerUrl);
+
+            const startTime = Math.floor(Date.now() / 1000);
+            const endTime = startTime + duration;
+            let nextHourTime = startTime + 3600;
+
+            // Send batch to Worker
+            worker.postMessage({ 
+                baseIntent: intention, 
+                repeats: repeats,
+                iterations: iterations
+            });
+
+            // Start UI Timer
+            timerInterval = setInterval(() => {
+                const currentTime = Math.floor(Date.now() / 1000);
+
+                if (currentTime >= endTime) {
+                    stopProcess(true);
+                    return;
+                }
+
+                if (currentTime >= nextHourTime) {
+                    worker.postMessage({ 
+                        baseIntent: intention, 
+                        repeats: repeats,
+                        iterations: iterations
+                    });
+                    nextHourTime += 3600;
+                }
+
+                const remaining = Math.max(0, endTime - currentTime);
+                document.getElementById('status').innerText = 
+                    `Intent Repeated ${repeats} Times Hourly: ${formatTime(remaining)}`;
+
+            }, 1000);
+
+            document.getElementById('status').innerText = 
+                `Intent Repeated ${repeats} Times Hourly: ${formatTime(duration)}`;
+        }
+
+        function stopProcess(completed = false) {
+            clearInterval(timerInterval);
+            if (worker) {
+                worker.terminate();
+            }
+
+            // Unlock UI (keep textarea disabled only if a binary file is currently loaded)
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('intentionInput').disabled = (loadedFileData !== null);
+            document.getElementById('fileInput').disabled = false;
+            document.getElementById('clearFileBtn').disabled = false;
+            document.getElementById('iterationsInput').disabled = false;
+            document.getElementById('repeatsInput').disabled = false;
+            document.getElementById('durationInput').disabled = false;
+
+            if (completed) {
+                document.getElementById('status').innerText = "Duration completed.";
+            } else {
+                document.getElementById('status').innerText = "Process manually stopped.";
+            }
+        }
+    </script>
+</body>
+</html>
