@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>TRIIN</title>
+    <style>
+      :root { font: 16px/1.5 system-ui, sans-serif; color-scheme: light dark; }
+      body { max-width: 42rem; margin: 3rem auto; padding: 0 1rem; }
+      h1 { line-height: 1.15; }
+      form { display: grid; gap: 0.75rem; }
+      textarea { box-sizing: border-box; width: 100%; min-height: 7rem; padding: 0.75rem; font: inherit; }
+      button { justify-self: start; padding: 0.6rem 1rem; font: inherit; cursor: pointer; }
+      button:disabled { cursor: wait; }
+      #message { min-height: 1.5em; }
+      #result { overflow-wrap: anywhere; padding: 1rem; border: 1px solid currentColor; border-radius: 0.5rem; }
+      #result[hidden] { display: none; }
+      dt { font-weight: 700; margin-top: 0.75rem; }
+      dd { margin-left: 0; overflow-wrap: anywhere; }
+      .note { opacity: 0.8; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>True Random Influenced Intention Number</h1>
+      <p>Enter an intention to hash it with SHA3-512 and calculate a result using eight RANDOM.ORG numbers from 1 to 1,000,000,000.</p>
+      <form id="triin-form">
+        <label for="intention">Intention</label>
+        <textarea id="intention" name="intention" required></textarea>
+        <button id="submit" type="submit">Generate number</button>
+      </form>
+      <p id="message" role="status" aria-live="polite"></p>
+      <section id="result" aria-labelledby="result-heading" hidden>
+        <h2 id="result-heading">Result</h2>
+        <dl>
+          <dt>TRIIN</dt><dd id="value"></dd>
+          <dt>SHA3-512 hash</dt><dd id="hash"></dd>
+          <dt>Random numbers</dt><dd id="numbers"></dd>
+        </dl>
+      </section>
+      <p class="note">Browser access to RANDOM.ORG may be restricted by its CORS policy or your network.</p>
+    </main>
+    <script type="module">
+      import { generateTriin } from './triin.js';
+
+      const form = document.querySelector('#triin-form');
+      const intentionInput = document.querySelector('#intention');
+      const submitButton = document.querySelector('#submit');
+      const message = document.querySelector('#message');
+      const result = document.querySelector('#result');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        submitButton.disabled = true;
+        result.hidden = true;
+        message.textContent = 'Generating…';
+
+        try {
+          const generated = await generateTriin(intentionInput.value);
+          document.querySelector('#value').textContent = generated.value.toString();
+          document.querySelector('#hash').textContent = generated.hash;
+          document.querySelector('#numbers').textContent = generated.randomNumbers.join(', ');
+          result.hidden = false;
+          message.textContent = 'Done.';
+        } catch (error) {
+          message.textContent = `Could not generate a result: ${error.message}`;
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
